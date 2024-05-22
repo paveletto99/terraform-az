@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-learning-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aks-learning-api
+  template:
+    metadata:
+      labels:
+        app: aks-learning-api
+    spec:
+      containers:
+        - name: aks-learning-api
+          image: bearacrdoit.azurecr.io/learning-webapp:7de2a924355b749227746f1fff44b865c8d30262
+          ports:
+            - containerPort: 5001
+          env:
+            - name: TITLE
+              value: "Welcome to Azure Kubernetes Service (AKS)"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks-learning-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5001
+  selector:
+    app: aks-learning-api

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dotnetapp
+  labels:
+    app: dotnetapp
+spec:
+  containers:
+    - image: "mcr.microsoft.com/dotnet/samples:dotnetapp"
+      name: dotnetapp-image
+      ports:
+        - containerPort: 80
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetapp
+spec:
+  selector:
+    app: dotnetapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dotnetapp
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            backend:
+              service:
+                name: dotnetapp
+                port:
+                  number: 80
+            pathType: Exact
+
+  defaultBackend:
+    service:
+      name: dotnetapp
+      port:
+        number: 80
