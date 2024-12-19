@@ -1,36 +1,68 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/debian
 {
-	"name": "Debian",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
-	"features": {
-		"ghcr.io/devcontainers/features/terraform:1": {
-			"installTFsec": true,
-			"installTerraformDocs": true,
-			"version": "latest",
-			"tflint": "latest",
-			"terragrunt": "latest"
-		},
-		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.20"
-		},
-		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/docker-in-docker:1": {
-			"version": "latest",
-			"moby": true
-		}
-	},
+  "name": "Terraform",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "installTFsec": true,
+      "installTerraformDocs": true,
+      "installSentinel": true,
+      "version": "latest",
+      "tflint": "latest",
+      "terragrunt": "latest"
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.22"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:1": {
+      "version": "latest",
+      "moby": true
+    }
+  },
+  "customizations": {
+    // Configure properties specific to VS Code.
+    "vscode": {
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "hashicorp.terraform",
+        "ms-azuretools.vscode-azureterraform",
+        "tfsec.tfsec",
+        "hashicorp.sentinel",
+        "hashicorp.hcl",
+        "bridgecrew.checkov"
+      ],
+      "settings": {
+        "[terraform]": {
+          "editor.defaultFormatter":
+          ,
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.formatAll.terraform": "explicit"
+          }
+        },
+        "[terraform-vars]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": false,
+          "editor.codeActionsOnSave": {
+            "source.formatAll.terraform": "explicit"
+          }
+        }
+      }
+    }
+  },
 
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sh .devcontainer/post-create.sh",
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "sh .devcontainer/post-create.sh",
 
-	// Configure tool-specific properties.
-	// "customizations": {},
+  // Configure tool-specific properties.
+  // "customizations": {},
 
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	"remoteUser": "root"
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  "remoteUser": "vscode"
 }

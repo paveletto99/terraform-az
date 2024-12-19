@@ -2,7 +2,7 @@
 #           GROUPS
 #######################################################
 module "resource_group" {
-  source   = "../modules/resources/groups"
+  source   = "../../../modules/resources/groups"
   name     = "${local.name_prefix}-rg"
   location = var.region
   tags     = local.common_tags
@@ -12,7 +12,7 @@ module "resource_group" {
 #           NETWORK
 #######################################################
 module "vnet" {
-  source             = "../modules/resources/network/vnet"
+  source             = "../../../modules/resources/network/vnet"
   region             = var.region
   vnet_name          = "${local.name_prefix}-vnet"
   vnet_rg_name       = module.resource_group.az_rg_name
@@ -22,7 +22,7 @@ module "vnet" {
 }
 
 module "private_sbn" {
-  source               = "../modules/resources/network/subnet"
+  source               = "../../../modules/resources/network/subnet"
   subnet_name          = "sbn-private"
   virtual_network_name = module.vnet.az_vnet_name
   resource_group_name  = module.resource_group.az_rg_name
@@ -30,7 +30,7 @@ module "private_sbn" {
   depends_on           = [module.vnet]
 }
 module "public_sbn" {
-  source               = "../modules/resources/network/subnet"
+  source               = "../../../modules/resources/network/subnet"
   subnet_name          = "sbn-public"
   virtual_network_name = module.vnet.az_vnet_name
   resource_group_name  = module.resource_group.az_rg_name
@@ -39,7 +39,7 @@ module "public_sbn" {
 
 }
 module "sqlserver_sbn" {
-  source               = "../modules/resources/network/subnet"
+  source               = "../../../modules/resources/network/subnet"
   subnet_name          = "sbn-sqlserver"
   virtual_network_name = module.vnet.az_vnet_name
   resource_group_name  = module.resource_group.az_rg_name
@@ -57,7 +57,7 @@ module "sqlserver_sbn" {
 
 }
 module "cosmos_mongo_sbn" {
-  source               = "../modules/resources/network/subnet"
+  source               = "../../../modules/resources/network/subnet"
   subnet_name          = "sbn-cosmos-mongo"
   virtual_network_name = module.vnet.az_vnet_name
   resource_group_name  = module.resource_group.az_rg_name
@@ -258,7 +258,7 @@ resource "azurerm_route_table" "dbs_route_table" {
   name                          = "routetable-db-mi"
   location                      = module.resource_group.az_rg_location
   resource_group_name           = module.resource_group.az_rg_name
-  disable_bgp_route_propagation = false
+  # disable_bgp_route_propagation = false
   tags                          = local.common_tags
   depends_on                    = [module.vnet]
 }
@@ -356,7 +356,7 @@ resource "azurerm_subnet_route_table_association" "sqlserver" {
 #           AKS CLUSTER
 #######################################################
 module "acr" {
-  source  = "../modules/resources/kubernetes/acr"
+  source  = "../../../modules/resources/kubernetes/acr"
   name    = "${local.pet}acrdoit"
   rg_name = module.resource_group.az_rg_name
   region  = var.region
@@ -364,7 +364,7 @@ module "acr" {
 }
 
 module "cluster" {
-  source              = "../modules/resources/kubernetes/aks"
+  source              = "../../../modules/resources/kubernetes/aks"
   resource_group_name = module.resource_group.az_rg_name
   location            = module.resource_group.az_rg_location
   environment         = local.common_tags.environment
@@ -405,7 +405,7 @@ module "cluster" {
 #           NAMESPACE
 #######################################################
 module "ns_app" {
-  source                     = "../modules/resources/kubernetes/namespace"
+  source                     = "../../../modules/resources/kubernetes/namespace"
   k8s_host                   = module.cluster.host
   k8s_client_certificate     = module.cluster.client_certificate
   k8s_client_key             = module.cluster.client_key
@@ -413,7 +413,7 @@ module "ns_app" {
   name_namespace             = "app-test"
 }
 module "ns_monitoring" {
-  source                     = "../modules/resources/kubernetes/namespace"
+  source                     = "../../../modules/resources/kubernetes/namespace"
   k8s_host                   = module.cluster.host
   k8s_client_certificate     = module.cluster.client_certificate
   k8s_client_key             = module.cluster.client_key

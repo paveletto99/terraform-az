@@ -1,6 +1,6 @@
 variable "config" {
   description = "(required) configuration variable value from the root module"
-  type        = {}
+  type        = object({})
 }
 variable "resource_group_name" {
   description = "(Required) The name of the resource group in which to create the Microsoft SQL Server. Changing this forces a new resource to be created."
@@ -62,45 +62,8 @@ variable "log_analytics_workspace_id" {
 # 🎰🎰🎰🎰🎰🎰
 
 
-variable "license_type" {
-  type        = string
-  description = "(Required) What type of license the Managed Instance will use."
-  default     = "BasePrice"
-
-  validation {
-    condition     = can(regex("^(PriceIncluded|BasePrice)$", var.license_type)) == true
-    error_message = "`license_type`'s possible values are `PriceIncluded` or `BasePrice`."
-  }
-}
-variable "sku_name" {
-  type        = string
-  description = "(Required) Specifies the SKU Name for the SQL Managed Instance."
-  default     = "GP_Gen5"
-
-  validation {
-    condition     = can(regex("^(GP_Gen4|GP_Gen5|GP_Gen8IM|GP_Gen8IH|BC_Gen4|BC_Gen5|BC_Gen8IM|BC_Gen8IH)$", var.sku_name)) == true
-    error_message = "`sku_name`'s possible values are GP_Gen4, GP_Gen5, GP_Gen8IM, GP_Gen8IH, BC_Gen4, BC_Gen5, BC_Gen8IM or BC_Gen8IH."
-  }
-}
-
-variable "storage_size_in_gb" {
-  type        = number
-  description = "(Required) Maximum storage space for the SQL Managed instance."
-  validation {
-    condition     = var.storage_size_in_gb % 32 == 0
-    error_message = "This should be a multiple of 32 (GB)"
-  }
-}
 
 
 
-variable "storage_account_type" {
-  type        = string
-  description = "(Optional) Specifies the storage account type used to store backups for this database. Changing this forces a new resource to be created."
-  default     = "GRS"
-  validation {
-    condition     = can(regex("^(GRS|LRS|ZRS)$", var.storage_account_type)) == true
-    error_message = "Possible values are GRS, LRS and ZRS. The default value is GRS."
-  }
-}
+
 

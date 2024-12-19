@@ -1,7 +1,6 @@
 output "az_vnet_name" {
   value = azurerm_virtual_network.vnet.name
 }
-
 output "az_vnet" {
   value = azurerm_virtual_network.vnet
 }

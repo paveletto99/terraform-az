@@ -5,21 +5,6 @@ variable "ingress_class" {
   default     = "nginx"
 }
 
-variable "ingress_type" {
-  description = "Internal or Public."
-  type        = string
-  default     = "Public"
-
-  validation {
-    condition = (
-      var.ingress_type == "Internal" ||
-      var.ingress_type == "Public"
-    )
-    error_message = "Value of ingress_type must be one of 'Internal' or 'Public'."
-  }
-
-}
-
 variable "metrics_enabled" {
   description = "enable Nginx ingress controller to export Prometheus metrics"
   type        = string

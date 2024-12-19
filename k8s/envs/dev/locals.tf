@@ -17,7 +17,4 @@ locals {
 
   name_prefix = "${var.naming_prefix}-${local.common_tags.environment}-${random_pet.rn.id}"
   dns_prefix  = "aks${random_pet.rn.id}"
-
-
-
 }

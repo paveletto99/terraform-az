@@ -31,11 +31,9 @@ resource "azurerm_virtual_network" "vnet" {
 resource "azurerm_subnet" "subnet" {
   for_each             = var.subnets
   depends_on           = [azurerm_virtual_network.vnet]
-  address_prefixes     = lookup(each.value, "cidr")
+  address_prefixes     = each.value["cidr"]
   name                 = each.key
   resource_group_name  = var.create_resource_group ? azurerm_resource_group.netrg[0].name : var.vnet_rg_name
-  service_endpoints    = lookup(each.value, "service_endpoints")
+  service_endpoints    = each.value["service_endpoints"]
   virtual_network_name = azurerm_virtual_network.vnet.name
-  # Enforce network policies to allow Private Endpoint to be added to the subnet
-  private_endpoint_network_policies_enabled = true
 }

@@ -1,0 +1,7 @@
+project             = "worklab"
+company             = "doIT"
+resource_group_name = "dev-rg"
+location            = "Sweden Central"
+vm_size             = "Standard_D16ps_v5"
+admin_username      = "pobo"
+vm_name             = "ubuntu-dev"

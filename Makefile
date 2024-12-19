@@ -1,27 +1,27 @@
-export ARM_CLIENT_ID="<APPID_VALUE>"
-export ARM_CLIENT_SECRET="<PASSWORD_VALUE>"
-export ARM_SUBSCRIPTION_ID="<SUBSCRIPTION_ID>"
-export ARM_TENANT_ID="<TENANT_VALUE>"
-
+# export ARM_CLIENT_ID="<APPID_VALUE>"
+# export ARM_CLIENT_SECRET="<PASSWORD_VALUE>"
+# export ARM_SUBSCRIPTION_ID="<SUBSCRIPTION_ID>"
+# export ARM_TENANT_ID="<TENANT_VALUE>"
+include .env
 
 export TF_VAR_sp_client_id=${ARM_CLIENT_ID}
 export TF_VAR_sp_client_secret=${ARM_CLIENT_SECRET}
 
-export TERRA_ENV=dev
+export TERRA_ENV=${TF_ENV}
 export TFLINT_LOG=info
+export PROJECT_SEL=worklab
 # export KUBE_CONFIG_PATH=./kubeconfig
 
 # infracost
 export INFRACOST_API_KEY=<KEY_VALUE>
-
 export CONTAINER_RUNTIME = docker
 
-PATH_TO_FILE = ${PWD}/environments/kubeconfig
+PATH_TO_FILE = ${PWD}/envs/kubeconfig
 
 .PHONY: init check plan apply destroy cleanup infracost
 
 init:
-	terraform -chdir=environments init
+	terraform -chdir=${PROJECT_SEL}/envs/${TERRA_ENV} init
 
 get-az-k8s-versions:
 	az login --service-principal --username ${ARM_CLIENT_ID} --tenant ${ARM_TENANT_ID}  --password ${ARM_CLIENT_SECRET}
@@ -29,41 +29,41 @@ get-az-k8s-versions:
 
 check:
 	$(info ************ ✅ Run linting ************)
-	terraform -chdir=environments fmt
-	terraform -chdir=environments validate
+	terraform -chdir=${PROJECT_SEL}/envs fmt
+	terraform -chdir=${PROJECT_SEL}/envs validate
 	tflint --recursive --fix
-	tflint --chdir=modules --config=".tflint.hcl"
-	tflint --chdir=environments/. --config=".tflint.hcl"
+	tflint --chdir=${PROJECT_SEL}/envs --config=".tflint.hcl"
+	tflint --chdir=envs/. --config=".tflint.hcl"
 # ${CONTAINER_RUNTIME} run --rm -v ${PWD}/:/data -t ghcr.io/terraform-linters/tflint-bundle:v0.40.1.0
 
 sec-check:
-	tfsec ./environments
+	tfsec ./${PROJECT_SEL}/envs
 	tfsec ./modules
 # ${CONTAINER_RUNTIME} run --rm -it -v "${PWD}:/src" aquasec/tfsec /src
 
 policy-check:
 	${CONTAINER_RUNTIME} run --rm --tty -v "${PWD}:/tf" --workdir /tf bridgecrew/checkov --directory /tf -o sarif -o cyclonedx --output-file-path ${PWD}/out/
 
-
 plan:
-	cd environments
+	cd ${PROJECT_SEL}/envs/${TERRA_ENV}
 	terraform workspace select --or-create ${TERRA_ENV}
-	terraform -chdir=environments plan -var-file="./varvalues/${TERRA_ENV}.tfvars"
+	terraform -chdir=${PROJECT_SEL}/envs/${TERRA_ENV} plan
+# terraform -chdir=${PROJECT_SEL}/envs/${TERRA_ENV} plan -var-file="./varvalues/${TERRA_ENV}.tfvars"
 
 apply:
 	terraform workspace select ${TERRA_ENV}
-	terraform -chdir=environments apply -var-file="./varvalues/${TERRA_ENV}.tfvars" -auto-approve
+	terraform -chdir=${PROJECT_SEL}/envs apply -var-file="./varvalues/${TERRA_ENV}.tfvars" -auto-approve
 	terraform show
 	terraform output
 
 destroy:
 	terraform workspace select ${TERRA_ENV}
-	terraform -chdir=environments destroy -var-file="./varvalues/${TERRA_ENV}.tfvars" -auto-approve
+	terraform -chdir=${PROJECT_SEL}/envs destroy -var-file="./varvalues/${TERRA_ENV}.tfvars" -auto-approve
 
 cleanup:
-	rm -f ${PWD}/environments/terraform.tfstate
-	rm -rf ${PWD}/environments/.terraform/
-	rm -f ${PWD}/environments/.kubeconfig
+	rm -f ${PWD}/${PROJECT_SEL}/envs//${TERRA_ENV}/terraform.tfstate
+	rm -rf ${PWD}/${PROJECT_SEL}/envs/${TERRA_ENV}/.terraform/
+	rm -f ${PWD}/${PROJECT_SEL}/envs//${TERRA_ENV}/.kubeconfig
 
 gen-doc:
 	terraform-docs markdown --output-file README.md ./modules/resources/kubernetes/aks
@@ -75,6 +75,9 @@ infracost-auth:
 infracost-run:
 	infracost breakdown --path=.
 
+login:
+	az login --service-principal --username ${ARM_CLIENT_ID} --password ${ARM_CLIENT_SECRET} --tenant ${ARM_TENANT_ID}
+.PHONY: login
 
 # TODO try k8s bench https://github.com/aquasecurity/kube-bench
 
