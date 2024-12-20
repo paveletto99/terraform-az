@@ -1,0 +1,10 @@
+#!/bin/bash
+apt update -y
+apt upgrade -y
+apt install -y ubuntu-desktop
+systemctl set-default graphical.target
+# rdp
+apt install -y xrdp
+systemctl enable xrdp
+systemctl start xrdp
+ufw allow 3389
